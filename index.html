@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>ご注文内容</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body{
+    margin:0;
+    background:#bfe9ff; /* 水色 */
+    font-family: system-ui, sans-serif;
+  }
+  .screen{
+    max-width:600px;
+    margin:auto;
+    padding:20px;
+  }
+  h1{
+    text-align:center;
+    margin-bottom:20px;
+  }
+  .box{
+    background:#fff;
+    border-radius:20px;
+    padding:20px;
+    font-size:22px;
+  }
+  .name{
+    font-size:28px;
+    font-weight:bold;
+    margin-bottom:12px;
+  }
+  .sub{
+    margin-top:8px;
+  }
+</style>
+</head>
+
+<body>
+<div class="screen">
+  <h1>ご注文内容</h1>
+  <div class="box" id="view">注文を入力中です</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAIcXnxMhmjY_90dqRubGk4waqaehpsjhI",
+  authDomain: "ra-men-43fab.firebaseapp.com",
+  databaseURL: "https://ra-men-43fab-default-rtdb.firebaseio.com",
+  projectId: "ra-men-43fab",
+  storageBucket: "ra-men-43fab.firebasestorage.app",
+  messagingSenderId: "451621666181",
+  appId: "1:451621666181:web:21ed43c38173c22dca18ec"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const view = document.getElementById("view");
+
+const dict = {
+  soup:["","鶏ガラ","豚骨","魚介系","野菜","清湯","白湯"],
+  kaeshi:["","塩","醤油","みそ"],
+  noodle:["","極太麺","中太麺","中細麺"],
+  shape:["","ストレート","ちぢれ"],
+  topping:["","ニンニク","背油","野菜","メンマ","わかめ","ねぎ","なると","コーン","チャーシュー","チーズ"]
+};
+
+onValue(ref(db,"currentOrder"), snap=>{
+  const d = snap.val();
+  if(!d || !d.number){
+    view.textContent = "注文を入力中です";
+    return;
+  }
+
+  const n = d.number.split("").map(Number);
+
+  const ramen =
+    dict.soup[n[0]]+" / "+
+    dict.kaeshi[n[1]]+" / "+
+    dict.noodle[n[2]]+" / "+
+    dict.shape[n[3]];
+
+  const tops = n.slice(4,8)
+    .map(x=>dict.topping[x])
+    .filter(Boolean)
+    .join("・") || "なし";
+
+  view.innerHTML = `
+    <div class="name">${d.name || ""}</div>
+    <div>${ramen}</div>
+    <div class="sub">トッピング：${tops}</div>
+    <div class="sub">麺量：${d.men}（${d.gram}g）</div>
+  `;
+});
+</script>
+</body>
+</html>
