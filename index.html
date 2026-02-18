@@ -61,12 +61,13 @@ const db = getDatabase(app);
 const view = document.getElementById("view");
 
 const dict = {
-  soup:["","鶏ガラ","豚骨","魚介系","野菜","清湯","白湯"],
-  kaeshi:["","塩","醤油","みそ"],
+  soup:["","塩","醤油","豚骨"],   // ←変更
+  kaeshi:["","塩","醤油"],        // ←変更
   noodle:["","極太麺","中太麺","中細麺"],
   shape:["","ストレート","ちぢれ"],
   topping:["","ニンニク","背油","野菜","メンマ","わかめ","ねぎ","なると","コーン","チャーシュー","チーズ"]
 };
+
 
 onValue(ref(db,"currentOrder"), snap=>{
   const d = snap.val();
